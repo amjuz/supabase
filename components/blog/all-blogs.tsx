@@ -10,12 +10,29 @@ export default async function AllBlogs() {
       {res.data?.map((item, i) => {
         return (
           <div className="border" key={i}>
-            <h2 className="text-3xl font-bold text-muted-foreground">{item.titile}</h2>
+            <h2 className="text-3xl font-bold text-muted-foreground">{item.title}</h2>
             <p>{item.content}</p>
-            <p>{item.author_id}</p>
+            <p>{item.user_id}</p>
           </div>
         );
       })}
     </div>
   );
 }
+
+/**
+ * #post
+ * 
+ * id -> post_id
+ * authorId -> user_id
+ * slug
+ * status
+ * 
+ * #comments
+ * 
+ * comment_id
+ * post_id
+ * user_id
+ * 
+ * 
+ * */ 

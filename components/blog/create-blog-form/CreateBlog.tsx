@@ -1,44 +1,67 @@
 "use client";
 
+import SelectBoxPostStatus from "@/components/select-box-post-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Database } from "@/types/database.types";
 import { supabase } from "@/utils/supabase/client";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { z } from "zod";
 
-interface IBlogInputForm {
-  title: string;
-  content: string;
-}
+// interface IBlogInputForm {
+//   title: string;
+//   content: string;
+
+// }
+// const post_status = 
+
+// type DBStatusEnum = Database['public']['Enums']['post_status']
+
+// const status = ['draft','publish']
+// const CreateBlogFormSchema = z.object({
+//   title: z.string(),
+//   content: z.string(),
+//   slug: z.string(),
+//    status: z.nativeEnum()
+// })
+
 export default function CreateBlog() {
-  const { handleSubmit, register, getValues } = useForm<IBlogInputForm>();
+  const { handleSubmit, register, getValues } =
+    useForm<Database["public"]["Tables"]["post"]["Row"]>();
   async function onSubmit() {
-    const userId = await (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) {
-      toast("user id invalid");
-      return;
-    }
+    // console.log(getValues(""))
+    // const userId = await (await supabase.auth.getUser()).data.user?.id;
+    // if (!userId) {
+    //   toast("user id invalid");
+    //   return;
+    // }
 
-    try {
-      const createBlog = await supabase.from("post").insert({
-        content: getValues("content"),
-        titile: getValues("title"),
-        author_id: userId,
-      }).select()
+    // try {
+    //   const createBlog = await supabase
+    //     .from("post")
+    //     .insert({
+    //       content: getValues("content"),
+    //       title: getValues("title"),
+    //       user_id: userId,
+    //       slug: "dsdd",
+    //       status: "draft",
+    //     })
+    //     .select();
 
-      console.log("res->", createBlog.data);
+    //   console.log("res->", createBlog.data);
 
-      const { count, data, error, status, statusText } = createBlog;
-      
-      if (error) {
-        toast.error("couldnt create blog");
-      }
-      toast.success("blog added");
+    //   const { count, data, error, status, statusText } = createBlog;
 
-      console.log("blog added");
-    } catch (error) {
-      toast.error("something went wrong");
-    }
+    //   if (error) {
+    //     toast.error("couldnt create blog");
+    //   }
+    //   toast.success("blog added");
+
+    //   console.log("blog added");
+    // } catch (error) {
+    //   toast.error("something went wrong");
+    // }
   }
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -59,6 +82,12 @@ export default function CreateBlog() {
           placeholder="Content"
           required
         />
+        <Input
+          required
+          placeholder="Enter a small title for SEO"
+          {...register("slug")}
+        />
+        <SelectBoxPostStatus register={register} />
         <div className="flex justify-end ">
           <Button>Create</Button>
         </div>

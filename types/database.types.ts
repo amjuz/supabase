@@ -36,33 +36,39 @@ export type Database = {
     Tables: {
       post: {
         Row: {
-          author_id: string
           content: string
           created_at: string
-          id: string
-          titile: string
+          post_id: string
+          slug: string
+          status: Database["public"]["Enums"]["post_status"]
+          title: string
+          user_id: string
         }
         Insert: {
-          author_id: string
           content: string
           created_at?: string
-          id?: string
-          titile: string
+          post_id?: string
+          slug: string
+          status: Database["public"]["Enums"]["post_status"]
+          title: string
+          user_id: string
         }
         Update: {
-          author_id?: string
           content?: string
           created_at?: string
-          id?: string
-          titile?: string
+          post_id?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["post_status"]
+          title?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "post_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
+            foreignKeyName: "post_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
             referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -70,20 +76,20 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
-          id: string
           name: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           email?: string | null
-          id?: string
           name?: string | null
+          user_id?: string
         }
         Update: {
           created_at?: string
           email?: string | null
-          id?: string
           name?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -95,7 +101,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      post_status: "publish" | "draft"
     }
     CompositeTypes: {
       [_ in never]: never
