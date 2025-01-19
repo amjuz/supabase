@@ -7,22 +7,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Database } from "@/types/database.types";
-import { UseFormRegister } from "react-hook-form";
+import {
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
+import {
+  TCreateBlogFormSchema,
+  TStatus,
+} from "./blog/create-blog-form/CreateBlog";
 
 type TSelectBoxPostStatus = {
-  register: UseFormRegister<Database["public"]["Tables"]["post"]["Row"]>
-}
-export default function SelectBoxPostStatus({register}:TSelectBoxPostStatus) {
+  register: UseFormRegister<TCreateBlogFormSchema>;
+  setValue: UseFormSetValue<TCreateBlogFormSchema>;
+  watch: UseFormWatch<TCreateBlogFormSchema>;
+};
+export default function SelectBoxPostStatus({
+  register,
+  setValue,
+  watch,
+}: TSelectBoxPostStatus) {
   return (
     <div className="space-y-2">
-      {/* <Label htmlFor={id}>Select with placeholder</Label> */}
-      <Select defaultValue="publish" {...register("status")}>
+      <Select
+        value={watch("status")}
+        onValueChange={(value) => setValue("status", value as TStatus[number])}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Select status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="publish" >Publish</SelectItem>
-          <SelectItem value="draft" >Draft</SelectItem>
+          <SelectItem value="publish">Publish</SelectItem>
+          <SelectItem value="draft">Draft</SelectItem>
         </SelectContent>
       </Select>
     </div>

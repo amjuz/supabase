@@ -3,65 +3,64 @@
 import SelectBoxPostStatus from "@/components/select-box-post-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Database } from "@/types/database.types";
-import { supabase } from "@/utils/supabase/client";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { supabase } from "@/utils/supabase/client";
 
-// interface IBlogInputForm {
-//   title: string;
-//   content: string;
+const status = ["draft", "publish"] as const;
+export type TStatus = ["draft", "publish"];
+const CreateBlogFormSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+  slug: z.string(),
+  status: z.enum(status),
+});
 
-// }
-// const post_status = 
-
-// type DBStatusEnum = Database['public']['Enums']['post_status']
-
-// const status = ['draft','publish']
-// const CreateBlogFormSchema = z.object({
-//   title: z.string(),
-//   content: z.string(),
-//   slug: z.string(),
-//    status: z.nativeEnum()
-// })
+export type TCreateBlogFormSchema = z.infer<typeof CreateBlogFormSchema>;
 
 export default function CreateBlog() {
-  const { handleSubmit, register, getValues } =
-    useForm<Database["public"]["Tables"]["post"]["Row"]>();
+  const {
+    handleSubmit,
+    register,
+    getValues,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<TCreateBlogFormSchema>({
+    resolver: zodResolver(CreateBlogFormSchema),
+    defaultValues: {
+      status: "publish",
+    },
+  });
+
   async function onSubmit() {
-    // console.log(getValues(""))
-    // const userId = await (await supabase.auth.getUser()).data.user?.id;
-    // if (!userId) {
-    //   toast("user id invalid");
-    //   return;
-    // }
+    try {
+      const userId = (await supabase.auth.getSession()).data.session?.user.id;
+      
+      if (!userId) {
+        toast.error("something went wrong, failed to retrieve user id");
+        return;
+      }
+      const { error } = await supabase.from("post").insert({
+        content: getValues("content"),
+        title: getValues("title"),
+        slug: getValues("slug"),
+        status: getValues("status"),
+        user_id: userId,
+      });
 
-    // try {
-    //   const createBlog = await supabase
-    //     .from("post")
-    //     .insert({
-    //       content: getValues("content"),
-    //       title: getValues("title"),
-    //       user_id: userId,
-    //       slug: "dsdd",
-    //       status: "draft",
-    //     })
-    //     .select();
-
-    //   console.log("res->", createBlog.data);
-
-    //   const { count, data, error, status, statusText } = createBlog;
-
-    //   if (error) {
-    //     toast.error("couldnt create blog");
-    //   }
-    //   toast.success("blog added");
-
-    //   console.log("blog added");
-    // } catch (error) {
-    //   toast.error("something went wrong");
-    // }
+      if (error) {
+        toast.error("Something went wrong, couldn't create blog");
+        return;
+      }
+      toast.success("blog added");
+      console.log("blog added");
+    } catch (error) {
+      console.log(error);
+      toast.error("something went wrong");
+    }
   }
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -75,6 +74,7 @@ export default function CreateBlog() {
           placeholder="Title"
           required
         />
+        {errors && errors.title?.message}
         <textarea
           {...register("content")}
           name="content"
@@ -82,12 +82,19 @@ export default function CreateBlog() {
           placeholder="Content"
           required
         />
+        {errors && errors.content?.message}
         <Input
           required
           placeholder="Enter a small title for SEO"
           {...register("slug")}
         />
-        <SelectBoxPostStatus register={register} />
+        {errors && errors.slug?.message}
+        <SelectBoxPostStatus
+          watch={watch}
+          register={register}
+          setValue={setValue}
+        />
+        {errors && errors.status?.message}
         <div className="flex justify-end ">
           <Button>Create</Button>
         </div>

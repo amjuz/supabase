@@ -64,9 +64,9 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "post_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: true
+            foreignKeyName: "post_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["user_id"]
           },
